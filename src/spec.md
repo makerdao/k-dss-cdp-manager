@@ -27,6 +27,7 @@ storage
 
 iff in range uint256
     Cdpi + 1
+    Count + 1
 
 iff
     Lad == CALLER_ID
@@ -72,6 +73,10 @@ storage
     list[LastDst].next |-> ListLastDstNext => cdp
     list[ListCdpPrev].next |-> ListListCdpPrevNext => ListCdpNext
     list[ListCdpNext].prev |-> ListListCdpNextPrev => #if ListCdpNext =/= 0 #then ListCdpPrev #else ListListCdpNextPrev #fi
+
+iff in range uint256
+    CountLad - 1
+    CountDst + 1
 
 iff
     VCallValue == 0
