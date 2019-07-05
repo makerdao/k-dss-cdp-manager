@@ -1,0 +1,3 @@
+[submodule "dss-cdp-manager"]
+	path = dss-cdp-manager
+	url = https://github.com/makerdao/dss-cdp-manager

@@ -1,0 +1,18 @@
+{
+    "name": "ds-cdp-manager",
+    "src": {
+      "specification": "src/spec.md",
+      "smt_prelude": "src/prelude.smt2.md",
+      "rules": [
+        "src/storage.k.md",
+        "src/lemmas.k.md"
+      ]
+    },
+    "implementations": {
+      "DssCdpManager": {
+        "solc_output": "dss-cdp-manager/out/DssCdpManager.sol.json"
+      }
+    },
+    "dapp_root": "dss-cdp-manager"
+  }
+  
