@@ -14,8 +14,8 @@ rule #DssCdpManager.list[Usr].prev => #hashedLocation("Solidity", 3, Usr)
 syntax Int ::= "#DssCdpManager.list" "[" Int "].next" [function]
 rule #DssCdpManager.list[Usr].next => #hashedLocation("Solidity", 3, Usr) +Int 1
 
-syntax Int ::= "#DssCdpManager.lads" "[" Int "]" [function]
-rule #DssCdpManager.lads[Cdp] => #hashedLocation("Solidity", 4, Cdp)
+syntax Int ::= "#DssCdpManager.owns" "[" Int "]" [function]
+rule #DssCdpManager.owns[Cdp] => #hashedLocation("Solidity", 4, Cdp)
 
 syntax Int ::= "#DssCdpManager.ilks" "[" Int "]" [function]
 rule #DssCdpManager.ilks[Cdp] => #hashedLocation("Solidity", 5, Cdp)

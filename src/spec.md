@@ -8,7 +8,7 @@ types
     Count : uint256
     Urn : address
     NewUrn : address
-    Lad : address
+    Own : address
     Ilk : bytes32
     First : uint256
     Prev : uint256
@@ -19,7 +19,7 @@ storage
     last[guy] |-> Last => Cdpi + 1
     count[guy] |-> Count => Count + 1
     urns[Cdpi + 1] |-> Urn => NewUrn
-    lads[Cdpi + 1] |-> Lad => guy
+    owns[Cdpi + 1] |-> Own => guy
     ilks[Cdpi + 1] |-> Ilk => ilk
     first[guy] |-> First => #if First == 0 #then Cdpi + 1 #else First #fi
     list[Cdpi + 1].prev |-> Prev => #if Last =/= 0 #then Last #else Prev #fi
@@ -30,7 +30,7 @@ iff in range uint256
     Count + 1
 
 iff
-    Lad == CALLER_ID
+    Own == CALLER_ID
     VCallValue == 0
 
 returns Cdpi + 1
@@ -46,12 +46,12 @@ interface give(uint256 cdp, address dst)
 
 types
     Allow : uint256
-    Lad : address
-    CountLad : uint256
+    Own : address
+    CountOwn : uint256
     CountDst : uint256
-    LastLad : uint256
+    LastOwn : uint256
     LastDst : uint256
-    FirstLad : uint256
+    FirstOwn : uint256
     FirstDst : uint256
     ListCdpPrev : uint256
     ListCdpNext : uint256
@@ -60,13 +60,13 @@ types
     ListListCdpNextPrev : uint256
 
 storage
-    allows[Lad][cdp][CALLER_ID] |-> Allow => Allow
-    lads[cdp] |-> Lad => dst
-    count[Lad] |-> CountLad => CountLad - 1
+    allows[Own][cdp][CALLER_ID] |-> Allow => Allow
+    owns[cdp] |-> Own => dst
+    count[Own] |-> CountOwn => CountOwn - 1
     count[dst] |-> CountDst => CountDst + 1
-    last[Lad] |-> LastLad => #if ListCdpNext == 0 #then ListCdpPrev #else LastLad #fi
+    last[Own] |-> LastOwn => #if ListCdpNext == 0 #then ListCdpPrev #else LastOwn #fi
     last[dst] |-> LastDst => cdp
-    first[Lad] |-> FirstLad => #if FirstLad == cdp #then ListCdpNext #else FirstLad #fi
+    first[Own] |-> FirstOwn => #if FirstOwn == cdp #then ListCdpNext #else FirstOwn #fi
     first[dst] |-> FirstDst => #if FirstDst == 0 #then cdp #else FirstDst #fi
     list[cdp].prev |-> ListCdpPrev => LastDst
     list[cdp].next |-> ListCdpNext => 0
@@ -75,36 +75,36 @@ storage
     list[ListCdpNext].prev |-> ListListCdpNextPrev => #if ListCdpNext =/= 0 #then ListCdpPrev #else ListListCdpNextPrev #fi
 
 iff in range uint256
-    CountLad - 1
+    CountOwn - 1
     CountDst + 1
 
 iff
     VCallValue == 0
-    (CALLER_ID == Lad) or (Allow == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+    dst =/= 0
 
 if
-    Lad =/= dst
-    cdp =/= ListCdpNext
-    ListCdpPrev =/= ListCdpNext
-    cdp =/= ListCdpPrev
+    Own =/= dst
     cdp =/= LastDst
+    cdp =/= ListCdpPrev
+    cdp =/= ListCdpNext
     LastDst =/= ListCdpPrev
 ```
 
 ```act
-behaviour giveSameLadDst of DssCdpManager
+behaviour giveSameOwnDst of DssCdpManager
 interface give(uint256 cdp, address dst)
 
 types
-    Allow : uint256
-    Lad : address
+    Own : address
 
 storage
-    allows[Lad][cdp][CALLER_ID] |-> Allow => Allow
-    lads[cdp] |-> Lad => dst
+    owns[cdp] |-> Own
 
 iff
     VCallValue == 0
-    (CALLER_ID == Lad) or (Allow == 1)
-    Lad =/= dst
+    Own =/= dst
+
+if
+    Own == dst
 ```
