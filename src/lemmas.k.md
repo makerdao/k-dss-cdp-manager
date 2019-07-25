@@ -480,3 +480,22 @@ rule (#sgnInterp(sgn(chop(A *Int #unsigned(B))) *Int sgn(#unsigned(B)), chop(abs
   andBool #rangeSInt(256, B)
   andBool B =/=Int 0
 ```
+
+```k
+syntax Int ::= "keccak03"
+rule keccak03 => 24465873643947496235832446106509767096567058095563226156125564318740882468607 [macro]
+
+rule keccakIntList(C) +Int B ==K keccak03 => false
+     requires 0 <=Int B andBool B <=Int 20
+     andBool C =/=K (3 0 .IntList)
+
+rule keccak03 ==K keccakIntList(C) +Int B => false
+     requires 0 <=Int B andBool B <=Int 20
+     andBool C =/=K (3 0 .IntList)
+
+rule keccakIntList(C) ==K keccak03 => false
+     requires C =/=K (3 0 .IntList)
+
+rule keccak03 ==K keccakIntList(C) => false
+     requires C =/=K (3 0 .IntList)
+```
