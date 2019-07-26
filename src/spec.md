@@ -92,17 +92,21 @@ if
 ```
 
 ```act
-behaviour giveSameOwnDst of DssCdpManager
+behaviour give2 of DssCdpManager
 interface give(uint256 cdp, address dst)
 
 types
+    Allow : uint256
     Own : address
 
 storage
-    owns[cdp] |-> Own
+    allows[Own][cdp][CALLER_ID] |-> Allow => Allow
+    owns[cdp] |-> Own => dst
 
 iff
     VCallValue == 0
+    (CALLER_ID == Own) or (Allow == 1)
+    dst =/= 0
     Own =/= dst
 
 if
