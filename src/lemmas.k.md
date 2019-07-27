@@ -512,4 +512,8 @@ rule keccak30PlusOne ==K keccakIntList(C) +Int B => false
 rule keccakIntList(C) ==K keccak30PlusOne => false
 
 rule keccak30PlusOne ==K keccakIntList(C) => false
+
+// higher-index setter elimination
+rule #rangeAux((WS:Map [ N := W ]), I, J) => #rangeAux(WS:Map, I, J)
+  requires N >=Int I +Int J
 ```
