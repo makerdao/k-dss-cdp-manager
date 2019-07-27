@@ -1,13 +1,11 @@
 ```act
 behaviour open of DssCdpManager
-interface open(bytes32 ilk, address guy)
+interface open(bytes32 ilk, address usr)
 
 types
     Cdpi : uint256
     Last : uint256
     Count : uint256
-    Urn : address
-    NewUrn : address
     Own : address
     Ilk : bytes32
     First : uint256
@@ -16,12 +14,11 @@ types
 
 storage
     cdpi |-> Cdpi => Cdpi + 1
-    last[guy] |-> Last => Cdpi + 1
-    count[guy] |-> Count => Count + 1
-    urns[Cdpi + 1] |-> Urn => NewUrn
-    owns[Cdpi + 1] |-> Own => guy
+    last[usr] |-> Last => Cdpi + 1
+    count[usr] |-> Count => Count + 1
+    owns[Cdpi + 1] |-> Own => usr
     ilks[Cdpi + 1] |-> Ilk => ilk
-    first[guy] |-> First => #if First == 0 #then Cdpi + 1 #else First #fi
+    first[usr] |-> First => #if First == 0 #then Cdpi + 1 #else First #fi
     list[Cdpi + 1].prev |-> Prev => #if Last =/= 0 #then Last #else Prev #fi
     list[Last].next |-> Next => #if Last =/= 0 #then Cdpi + 1 #else Next #fi
 
@@ -30,11 +27,16 @@ iff in range uint256
     Count + 1
 
 iff
-    Own == CALLER_ID
     VCallValue == 0
+    usr =/= 0
 
 returns Cdpi + 1
 ```
+    Urn : address
+    NewUrn : address
+
+    urns[Cdpi + 1] |-> Urn => NewUrn
+
 
 if
     NewUrn == #newAddr(ACCT_ID, NONCE)
