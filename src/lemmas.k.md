@@ -501,14 +501,6 @@ rule keccakIntList(C) ==K keccak30 => false
 rule keccak30 ==K keccakIntList(C) => false
   requires C =/=K (3 0 .IntList)
 
-rule keccakIntList(C) +Int B ==K keccak30PlusOne => false
-  requires 0 <=Int B andBool B <=Int 20
-  andBool (C =/=K (3 0 .IntList) orBool B =/=Int 1)
-
-rule keccak30PlusOne ==K keccakIntList(C) +Int B => false
-  requires 0 <=Int B andBool B <=Int 20
-  andBool (C =/=K (3 0 .IntList) orBool B =/=Int 1)
-
 rule keccakIntList(C) ==K keccak30PlusOne => false
 
 rule keccak30PlusOne ==K keccakIntList(C) => false
