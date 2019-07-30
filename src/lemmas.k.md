@@ -513,7 +513,9 @@ rule keccakIntList(C) ==K keccak30PlusOne => false
 
 rule keccak30PlusOne ==K keccakIntList(C) => false
 
-// higher-index setter elimination
-rule #rangeAux((WS:Map [ N := W ]), I, J) => #rangeAux(WS:Map, I, J)
-  requires N >=Int I +Int J
+rule WM [ N := #take(I, W) ] => (WM [ N := (W [ 0 ] : .WordStack) ]) [ (N +Int 1) := (#take(I -Int 1, #drop(1, W))) ]
+  requires I >=Int 1
+
+rule WM [ N := #take(I, #drop(J, W)) ] => WM [ N := (W [ J ] : .WordStack) ] [ (N +Int 1) := (#take(I -Int 1, #drop(J +Int 1, W))) ]
+  requires I >=Int 1
 ```
