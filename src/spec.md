@@ -1,3 +1,37 @@
+# DssCdpManager acts
+
+```act
+behaviour add of DssCdpManager
+interface add(uint256 x, uint256 y) internal
+
+stack
+
+    y : x : JMPTO : WS => JMPTO : x + y : WS
+
+iff in range uint256
+
+    x + y
+
+if
+    #sizeWordStack(WS) <= 100
+```
+
+```act
+behaviour sub of DssCdpManager
+interface sub(uint256 x, uint256 y) internal
+
+stack
+
+    y : x : JMPTO : WS => JMPTO : x - y : WS
+
+iff in range uint256
+
+    x - y
+
+if
+    #sizeWordStack(WS) <= 100
+```
+
 ```act
 behaviour open of DssCdpManager
 interface open(bytes32 ilk, address usr)
@@ -34,6 +68,9 @@ iff
     usr =/= 0
 
 returns Cdpi + 1
+
+calls
+    DssCdpManager.add
 ```
 
 ```act
@@ -85,6 +122,10 @@ if
     cdp =/= ListCdpPrev
     cdp =/= ListCdpNext
     LastDst =/= ListCdpPrev
+
+calls
+    DssCdpManager.add
+    DssCdpManager.sub
 ```
 
 ```act
@@ -107,4 +148,8 @@ iff
 
 if
     Own == dst
+
+calls
+    DssCdpManager.add
+    DssCdpManager.sub
 ```
