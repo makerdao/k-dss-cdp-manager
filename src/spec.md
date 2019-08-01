@@ -4,6 +4,8 @@ interface open(bytes32 ilk, address usr)
 
 types
     Cdpi : uint256
+    Urn : address
+    NewUrn : address
     Last : uint256
     Count : uint256
     Own : address
@@ -14,6 +16,7 @@ types
 
 storage
     cdpi |-> Cdpi => Cdpi + 1
+    urns[Cdpi + 1] |-> Urn => NewUrn
     last[usr] |-> Last => Cdpi + 1
     count[usr] |-> Count => Count + 1
     owns[Cdpi + 1] |-> Own => usr
@@ -32,15 +35,6 @@ iff
 
 returns Cdpi + 1
 ```
-    Urn : address
-    NewUrn : address
-
-    urns[Cdpi + 1] |-> Urn => NewUrn
-
-
-if
-    NewUrn == #newAddr(ACCT_ID, NONCE)
-    (notBool (NewUrn in_keys(ACCTS)))
 
 ```act
 behaviour give of DssCdpManager
