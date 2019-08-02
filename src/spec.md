@@ -229,6 +229,89 @@ calls
     Vat.flux-same
 ```
 
+```act
+behaviour flux of DssCdpManager
+interface flux(uint256 cdp, address dst, uint256 wad)
+
+types
+    Vat     : address Vat
+    Allow   : uint256
+    Own     : address
+    Urn     : address
+    Ilk     : bytes32
+    May     : uint256
+    GemUrn  : uint256
+    GemDst  : uint256
+
+storage
+    vat                         |-> Vat
+    allows[Own][cdp][CALLER_ID] |-> Allow
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+    can[Urn][ACCT_ID]   |-> May
+    gem[Ilk][Urn]       |-> GemUrn => GemUrn - wad
+    gem[Ilk][dst]       |-> GemDst => GemDst + wad
+
+iff
+    VCallValue == 0
+    VCallDepth < 1024
+    (ACCT_ID == Urn) or (May == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+
+iff in range uint256
+    GemUrn - wad
+    GemDst + wad
+
+if
+    Urn =/= dst
+
+calls
+    Vat.flux-diff
+```
+
+```act
+behaviour flux2 of DssCdpManager
+interface flux(uint256 cdp, address dst, uint256 wad)
+
+types
+    Vat     : address Vat
+    Allow   : uint256
+    Own     : address
+    Urn     : address
+    Ilk     : bytes32
+    May     : uint256
+    Gem     : uint256
+
+storage
+    vat                         |-> Vat
+    allows[Own][cdp][CALLER_ID] |-> Allow
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+    can[Urn][ACCT_ID]   |-> May
+    gem[Ilk][Urn]       |-> Gem => Gem
+
+iff
+    VCallValue == 0
+    VCallDepth < 1024
+    (ACCT_ID == Urn) or (May == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+
+iff in range uint256
+    Gem - wad
+
+if
+    Urn == dst
+
+calls
+    Vat.flux-same
+```
+
 # Vat acts
 
 ```act
