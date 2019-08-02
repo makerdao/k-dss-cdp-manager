@@ -11,6 +11,9 @@
     "implementations": {
       "DssCdpManager": {
         "src": "src/DssCdpManager.sol"
+      },
+      "Vat": {
+        "src": "lib/dss-deploy/lib/dss/src/vat.sol"
       }
     },
     "dapp_root": "./dss-cdp-manager"
