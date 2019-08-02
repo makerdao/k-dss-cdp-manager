@@ -400,3 +400,62 @@ calls
     Vat.subuu
     Vat.adduu
 ```
+
+```act
+behaviour move-diff of Vat
+interface move(address src, address dst, uint256 rad)
+
+for all
+    Dai_dst : uint256
+    Dai_src : uint256
+    May     : uint256
+
+storage
+    can[src][CALLER_ID] |-> May
+    dai[src]            |-> Dai_src => Dai_src - rad
+    dai[dst]            |-> Dai_dst => Dai_dst + rad
+
+iff
+    // act: caller is `. ? : not` authorised
+    (May == 1 or src == CALLER_ID)
+    VCallValue == 0
+
+iff in range uint256
+    Dai_src - rad
+    Dai_dst + rad
+
+if
+    src =/= dst
+
+calls
+  Vat.adduu
+  Vat.subuu
+```
+
+```act
+behaviour move-same of Vat
+interface move(address src, address dst, uint256 rad)
+
+for all
+    Dai_src : uint256
+    May     : uint256
+
+storage
+    can[src][CALLER_ID] |-> May
+    dai[src]            |-> Dai_src => Dai_src
+
+iff
+    // act: caller is `. ? : not` authorised
+    (May == 1 or src == CALLER_ID)
+    VCallValue == 0
+
+iff in range uint256
+    Dai_src - rad
+
+if
+    src == dst
+
+calls
+    Vat.subuu
+    Vat.adduu
+```
