@@ -312,6 +312,85 @@ calls
     Vat.flux-same
 ```
 
+```act
+behaviour move of DssCdpManager
+interface move(uint256 cdp, address dst, uint256 rad)
+
+types
+    Vat     : address Vat
+    Allow   : uint256
+    Own     : address
+    Urn     : address
+    May     : uint256
+    DaiUrn  : uint256
+    DaiDst  : uint256
+
+storage
+    vat                         |-> Vat
+    allows[Own][cdp][CALLER_ID] |-> Allow
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+
+storage Vat
+    can[Urn][ACCT_ID]   |-> May
+    dai[Urn]            |-> DaiUrn => DaiUrn - rad
+    dai[dst]            |-> DaiDst => DaiDst + rad
+
+iff
+    VCallValue == 0
+    VCallDepth < 1024
+    (ACCT_ID == Urn) or (May == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+
+iff in range uint256
+    DaiUrn - rad
+    DaiDst + rad
+
+if
+    Urn =/= dst
+
+calls
+    Vat.move-diff
+```
+
+```act
+behaviour move2 of DssCdpManager
+interface move(uint256 cdp, address dst, uint256 rad)
+
+types
+    Vat     : address Vat
+    Allow   : uint256
+    Own     : address
+    Urn     : address
+    May     : uint256
+    Dai     : uint256
+
+storage
+    vat                         |-> Vat
+    allows[Own][cdp][CALLER_ID] |-> Allow
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+
+storage Vat
+    can[Urn][ACCT_ID]   |-> May
+    dai[Urn]            |-> Dai => Dai
+
+iff
+    VCallValue == 0
+    VCallDepth < 1024
+    (ACCT_ID == Urn) or (May == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+
+iff in range uint256
+    Dai - rad
+
+if
+    Urn == dst
+
+calls
+    Vat.move-same
+```
+
 # Vat acts
 
 ```act
