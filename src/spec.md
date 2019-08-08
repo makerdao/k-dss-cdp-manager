@@ -33,6 +33,7 @@ behaviour open of DssCdpManager
 interface open(bytes32 ilk, address usr)
 
 types
+    Vat     : address Vat
     Cdpi    : uint256
     Urn     : address
     NewUrn  : address
@@ -45,6 +46,7 @@ types
     Next    : uint256
 
 storage
+    vat                 |-> Vat
     cdpi                |-> Cdpi => Cdpi + 1
     urns[Cdpi + 1]      |-> Urn => NewUrn
     last[usr]           |-> Last => Cdpi + 1
@@ -66,6 +68,7 @@ iff
 returns Cdpi + 1
 
 calls
+    Vat.hope
     DssCdpManager.add
 ```
 
@@ -419,6 +422,19 @@ iff in range uint256
 
 if
     #sizeWordStack(WS) <= 100
+```
+
+```act
+behaviour hope of Vat
+interface hope(address usr)
+
+storage
+
+    can[CALLER_ID][usr] |-> _ => 1
+
+iff
+
+    VCallValue == 0
 ```
 
 ```act
