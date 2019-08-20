@@ -5,12 +5,15 @@ behaviour add of DssCdpManager
 interface add(uint256 x, uint256 y) internal
 
 stack
+
     y : x : JMPTO : WS => JMPTO : x + y : WS
 
 iff in range uint256
+
     x + y
 
 if
+
     #sizeWordStack(WS) <= 100
 ```
 
@@ -19,12 +22,15 @@ behaviour sub of DssCdpManager
 interface sub(uint256 x, uint256 y) internal
 
 stack
+
     y : x : JMPTO : WS => JMPTO : x - y : WS
 
 iff in range uint256
+
     x - y
 
 if
+
     #sizeWordStack(WS) <= 100
 ```
 
@@ -33,6 +39,7 @@ behaviour open of DssCdpManager
 interface open(bytes32 ilk, address usr)
 
 types
+
     Vat     : address Vat
     Cdpi    : uint256
     Urn     : address
@@ -46,6 +53,7 @@ types
     Next    : uint256
 
 storage
+
     vat                 |-> Vat
     cdpi                |-> Cdpi => Cdpi + 1
     urns[Cdpi + 1]      |-> Urn => NewUrn
@@ -58,16 +66,19 @@ storage
     list[Last].next     |-> Next => #if Last =/= 0 #then Cdpi + 1 #else Next #fi
 
 iff in range uint256
+
     Cdpi + 1
     Count + 1
 
 iff
+
     VCallValue == 0
     usr =/= 0
 
 returns Cdpi + 1
 
 calls
+
     Vat.hope
     DssCdpManager.add
 ```
@@ -77,6 +88,7 @@ behaviour give of DssCdpManager
 interface give(uint256 cdp, address dst)
 
 types
+
     Allow               : uint256
     Own                 : address
     CountOwn            : uint256
@@ -92,6 +104,7 @@ types
     ListListCdpNextPrev : uint256
 
 storage
+
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own => dst
     count[Own]                  |-> CountOwn => CountOwn - 1
@@ -107,15 +120,18 @@ storage
     list[ListCdpNext].prev      |-> ListListCdpNextPrev => #if ListCdpNext =/= 0 #then ListCdpPrev #else ListListCdpNextPrev #fi
 
 iff in range uint256
+
     CountOwn - 1
     CountDst + 1
 
 iff
+
     VCallValue == 0
     (CALLER_ID == Own) or (Allow == 1)
     dst =/= 0
 
 if
+
     Own =/= dst
     cdp =/= LastDst
     cdp =/= ListCdpPrev
@@ -123,6 +139,7 @@ if
     LastDst =/= ListCdpPrev
 
 calls
+
     DssCdpManager.add
     DssCdpManager.sub
 ```
@@ -132,23 +149,28 @@ behaviour give2 of DssCdpManager
 interface give(uint256 cdp, address dst)
 
 types
+
     Allow   : uint256
     Own     : address
 
 storage
+
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own => dst
 
 iff
+
     VCallValue == 0
     (CALLER_ID == Own) or (Allow == 1)
     dst =/= 0
     Own =/= dst
 
 if
+
     Own == dst
 
 calls
+
     DssCdpManager.add
     DssCdpManager.sub
 ```
@@ -158,6 +180,7 @@ behaviour fluxIlk of DssCdpManager
 interface flux(bytes32 ilk, uint256 cdp, address dst, uint256 wad)
 
 types
+
     Vat     : address Vat
     Allow   : uint256
     Own     : address
@@ -167,30 +190,36 @@ types
     GemDst  : uint256
 
 storage
+
     vat                         |-> Vat
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
 storage Vat
+
     can[Urn][ACCT_ID]   |-> May
     gem[ilk][Urn]       |-> GemUrn => GemUrn - wad
     gem[ilk][dst]       |-> GemDst => GemDst + wad
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
     (CALLER_ID == Own) or (Allow == 1)
 
 iff in range uint256
+
     GemUrn - wad
     GemDst + wad
 
 if
+
     Urn =/= dst
 
 calls
+
     Vat.flux-diff
 ```
 
@@ -199,6 +228,7 @@ behaviour fluxIlk2 of DssCdpManager
 interface flux(bytes32 ilk, uint256 cdp, address dst, uint256 wad)
 
 types
+
     Vat     : address Vat
     Allow   : uint256
     Own     : address
@@ -207,28 +237,34 @@ types
     Gem     : uint256
 
 storage
+
     vat                         |-> Vat
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
 storage Vat
+
     can[Urn][ACCT_ID]   |-> May
     gem[ilk][Urn]       |-> Gem => Gem
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
     (CALLER_ID == Own) or (Allow == 1)
 
 iff in range uint256
+
     Gem - wad
 
 if
+
     Urn == dst
 
 calls
+
     Vat.flux-same
 ```
 
@@ -237,6 +273,7 @@ behaviour flux of DssCdpManager
 interface flux(uint256 cdp, address dst, uint256 wad)
 
 types
+
     Vat     : address Vat
     Allow   : uint256
     Own     : address
@@ -247,6 +284,7 @@ types
     GemDst  : uint256
 
 storage
+
     vat                         |-> Vat
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own
@@ -254,24 +292,29 @@ storage
     ilks[cdp]                   |-> Ilk
 
 storage Vat
+
     can[Urn][ACCT_ID]   |-> May
     gem[Ilk][Urn]       |-> GemUrn => GemUrn - wad
     gem[Ilk][dst]       |-> GemDst => GemDst + wad
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
     (CALLER_ID == Own) or (Allow == 1)
 
 iff in range uint256
+
     GemUrn - wad
     GemDst + wad
 
 if
+
     Urn =/= dst
 
 calls
+
     Vat.flux-diff
 ```
 
@@ -280,6 +323,7 @@ behaviour flux2 of DssCdpManager
 interface flux(uint256 cdp, address dst, uint256 wad)
 
 types
+
     Vat     : address Vat
     Allow   : uint256
     Own     : address
@@ -289,6 +333,7 @@ types
     Gem     : uint256
 
 storage
+
     vat                         |-> Vat
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own
@@ -296,22 +341,27 @@ storage
     ilks[cdp]                   |-> Ilk
 
 storage Vat
+
     can[Urn][ACCT_ID]   |-> May
     gem[Ilk][Urn]       |-> Gem => Gem
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
     (CALLER_ID == Own) or (Allow == 1)
 
 iff in range uint256
+
     Gem - wad
 
 if
+
     Urn == dst
 
 calls
+
     Vat.flux-same
 ```
 
@@ -320,6 +370,7 @@ behaviour move of DssCdpManager
 interface move(uint256 cdp, address dst, uint256 rad)
 
 types
+
     Vat     : address Vat
     Allow   : uint256
     Own     : address
@@ -329,30 +380,36 @@ types
     DaiDst  : uint256
 
 storage
+
     vat                         |-> Vat
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
 storage Vat
+
     can[Urn][ACCT_ID]   |-> May
     dai[Urn]            |-> DaiUrn => DaiUrn - rad
     dai[dst]            |-> DaiDst => DaiDst + rad
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
     (CALLER_ID == Own) or (Allow == 1)
 
 iff in range uint256
+
     DaiUrn - rad
     DaiDst + rad
 
 if
+
     Urn =/= dst
 
 calls
+
     Vat.move-diff
 ```
 
@@ -361,6 +418,7 @@ behaviour move2 of DssCdpManager
 interface move(uint256 cdp, address dst, uint256 rad)
 
 types
+
     Vat     : address Vat
     Allow   : uint256
     Own     : address
@@ -369,28 +427,34 @@ types
     Dai     : uint256
 
 storage
+
     vat                         |-> Vat
     allows[Own][cdp][CALLER_ID] |-> Allow
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
 storage Vat
+
     can[Urn][ACCT_ID]   |-> May
     dai[Urn]            |-> Dai => Dai
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
     (CALLER_ID == Own) or (Allow == 1)
 
 iff in range uint256
+
     Dai - rad
 
 if
+
     Urn == dst
 
 calls
+
     Vat.move-same
 ```
 
@@ -454,12 +518,15 @@ behaviour adduu of Vat
 interface add(uint256 x, uint256 y) internal
 
 stack
+
     y : x : JMPTO : WS => JMPTO : x + y : WS
 
 iff in range uint256
+
     x + y
 
 if
+
     #sizeWordStack(WS) <= 100
 ```
 
@@ -468,12 +535,15 @@ behaviour subuu of Vat
 interface sub(uint256 x, uint256 y) internal
 
 stack
+
     y : x : JMPTO : WS => JMPTO : x - y : WS
 
 iff in range uint256
+
     x - y
 
 if
+
     #sizeWordStack(WS) <= 100
 ```
 
@@ -491,7 +561,6 @@ iff in range uint256
 
 if
 
-    // TODO: strengthen
     #sizeWordStack(WS) <= 1000
 ```
 
@@ -513,28 +582,34 @@ behaviour flux-diff of Vat
 interface flux(bytes32 ilk, address src, address dst, uint256 wad)
 
 for all
+
     May     : uint256
     Gem_src : uint256
     Gem_dst : uint256
 
 storage
+
     can[src][CALLER_ID] |-> May
     gem[ilk][src]       |-> Gem_src => Gem_src - wad
     gem[ilk][dst]       |-> Gem_dst => Gem_dst + wad
 
 iff
+
     // act: caller is `. ? : not` authorised
     (May == 1 or src == CALLER_ID)
     VCallValue == 0
 
 iff in range uint256
+
     Gem_src - wad
     Gem_dst + wad
 
 if
+
     src =/= dst
 
 calls
+
     Vat.subuu
     Vat.adduu
 ```
@@ -544,25 +619,31 @@ behaviour flux-same of Vat
 interface flux(bytes32 ilk, address src, address dst, uint256 wad)
 
 for all
+
     May     : uint256
     Gem_src : uint256
 
 storage
+
     can[src][CALLER_ID] |-> May
     gem[ilk][src]       |-> Gem_src => Gem_src
 
 iff
+
     // act: caller is `. ? : not` authorised
     (May == 1 or src == CALLER_ID)
     VCallValue == 0
 
 iff in range uint256
+
     Gem_src - wad
 
 if
+
     src == dst
 
 calls
+
     Vat.subuu
     Vat.adduu
 ```
@@ -572,28 +653,34 @@ behaviour move-diff of Vat
 interface move(address src, address dst, uint256 rad)
 
 for all
+
     Dai_dst : uint256
     Dai_src : uint256
     May     : uint256
 
 storage
+
     can[src][CALLER_ID] |-> May
     dai[src]            |-> Dai_src => Dai_src - rad
     dai[dst]            |-> Dai_dst => Dai_dst + rad
 
 iff
+
     // act: caller is `. ? : not` authorised
     (May == 1 or src == CALLER_ID)
     VCallValue == 0
 
 iff in range uint256
+
     Dai_src - rad
     Dai_dst + rad
 
 if
+
     src =/= dst
 
 calls
+
   Vat.adduu
   Vat.subuu
 ```
@@ -603,25 +690,31 @@ behaviour move-same of Vat
 interface move(address src, address dst, uint256 rad)
 
 for all
+
     Dai_src : uint256
     May     : uint256
 
 storage
+
     can[src][CALLER_ID] |-> May
     dai[src]            |-> Dai_src => Dai_src
 
 iff
+
     // act: caller is `. ? : not` authorised
     (May == 1 or src == CALLER_ID)
     VCallValue == 0
 
 iff in range uint256
+
     Dai_src - rad
 
 if
+
     src == dst
 
 calls
+
     Vat.subuu
     Vat.adduu
 ```
@@ -682,6 +775,7 @@ iff in range int256
     Ilk_rate * dart
 
 iff
+
     VCallValue == 0
     Live == 1
     Ilk_rate =/= 0
@@ -764,6 +858,7 @@ iff in range int256
     Ilk_rate
 
 iff
+
     VCallValue == 0
     Live == 1
     Ilk_rate =/= 0
@@ -843,6 +938,7 @@ iff in range int256
     Ilk_rate * dart
 
 iff
+
     VCallValue == 0
     Live == 1
     Ilk_rate =/= 0
@@ -1321,6 +1417,7 @@ storage
 
 
 iff
+
     VCallValue == 0
 
     (dink >= 0) or (Ink_u - dink <= maxUInt256)
