@@ -84,7 +84,7 @@ calls
 ```
 
 ```act
-behaviour give of DssCdpManager
+behaviour give-diff-own-dst of DssCdpManager
 interface give(uint256 cdp, address dst)
 
 types
@@ -145,7 +145,7 @@ calls
 ```
 
 ```act
-behaviour give2 of DssCdpManager
+failure give-same-own-dst of DssCdpManager
 interface give(uint256 cdp, address dst)
 
 types
@@ -176,7 +176,7 @@ calls
 ```
 
 ```act
-behaviour fluxIlk of DssCdpManager
+behaviour flux-ilk-diff of DssCdpManager
 interface flux(bytes32 ilk, uint256 cdp, address dst, uint256 wad)
 
 types
@@ -224,7 +224,7 @@ calls
 ```
 
 ```act
-behaviour fluxIlk2 of DssCdpManager
+behaviour flux-ilk-same of DssCdpManager
 interface flux(bytes32 ilk, uint256 cdp, address dst, uint256 wad)
 
 types
@@ -269,7 +269,7 @@ calls
 ```
 
 ```act
-behaviour flux of DssCdpManager
+behaviour flux-diff of DssCdpManager
 interface flux(uint256 cdp, address dst, uint256 wad)
 
 types
@@ -319,7 +319,7 @@ calls
 ```
 
 ```act
-behaviour flux2 of DssCdpManager
+behaviour flux-same of DssCdpManager
 interface flux(uint256 cdp, address dst, uint256 wad)
 
 types
@@ -366,7 +366,7 @@ calls
 ```
 
 ```act
-behaviour move of DssCdpManager
+behaviour move-diff of DssCdpManager
 interface move(uint256 cdp, address dst, uint256 rad)
 
 types
@@ -414,7 +414,7 @@ calls
 ```
 
 ```act
-behaviour move2 of DssCdpManager
+behaviour move-same of DssCdpManager
 interface move(uint256 cdp, address dst, uint256 rad)
 
 types
@@ -509,7 +509,6 @@ iff in range int256
 
 if
 
-    // TODO: strengthen
     #sizeWordStack(WS) <= 1000
 ```
 
@@ -1330,8 +1329,6 @@ calls
     Vat.mului
     Vat.muluu
 ```
-
-#### forking a position
 
 ```act
 behaviour fork-diff of Vat
