@@ -458,6 +458,135 @@ calls
     Vat.move-same
 ```
 
+```act
+behaviour quit-diff of DssCdpManager
+interface quit(uint256 cdp, address dst)
+
+types
+
+    Vat     : address Vat
+    Allow   : uint256
+    Own     : address
+    Urn     : address
+    Ilk     : bytes32
+    Can_urn : uint256
+    Can_dst : uint256
+    Rate    : uint256
+    Spot    : uint256
+    Dust    : uint256
+    Ink_u   : uint256
+    Art_u   : uint256
+    Ink_v   : uint256
+    Art_v   : uint256
+
+storage
+
+    vat                         |-> Vat
+    allows[Own][cdp][CALLER_ID] |-> Allow
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    can[Urn][ACCT_ID]   |-> Can_urn
+    can[dst][ACCT_ID]   |-> Can_dst
+    ilks[Ilk].rate      |-> Rate
+    ilks[Ilk].spot      |-> Spot
+    ilks[Ilk].dust      |-> Dust
+    urns[Ilk][Urn].ink  |-> Ink_u => 0
+    urns[Ilk][Urn].art  |-> Art_u => 0
+    urns[Ilk][dst].ink  |-> Ink_v => Ink_v + Ink_u
+    urns[Ilk][dst].art  |-> Art_v => Art_v + Art_u
+
+iff
+    VCallValue == 0
+    VCallDepth < 1024
+    (ACCT_ID == Urn) or (Can_urn == 1)
+    (ACCT_ID == dst) or (Can_dst == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+
+    (Art_v + Art_u) * Rate <= (Ink_v + Ink_u) * Spot
+    ((Art_v + Art_u) * Rate >= Dust) or (Art_v + Art_u == 0)
+
+iff in range uint256
+
+    Ink_v + Ink_u
+    Art_v + Art_u
+    (Ink_v + Ink_u) * Spot
+
+iff in range int256
+
+    Ink_u
+    Art_u
+
+if
+
+    Urn =/= dst
+
+calls
+
+    Vat.fork-diff
+```
+
+```act
+behaviour quit-same of DssCdpManager
+interface quit(uint256 cdp, address dst)
+
+types
+
+    Vat     : address Vat
+    Allow   : uint256
+    Own     : address
+    Urn     : address
+    Ilk     : bytes32
+    Can_urn : uint256
+    Rate    : uint256
+    Spot    : uint256
+    Dust    : uint256
+    Ink_u   : uint256
+    Art_u   : uint256
+
+storage
+
+    vat                         |-> Vat
+    allows[Own][cdp][CALLER_ID] |-> Allow
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    can[Urn][ACCT_ID]   |-> Can_urn
+    ilks[Ilk].rate      |-> Rate
+    ilks[Ilk].spot      |-> Spot
+    ilks[Ilk].dust      |-> Dust
+    urns[Ilk][Urn].ink  |-> Ink_u => Ink_u
+    urns[Ilk][Urn].art  |-> Art_u => Art_u
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+    (ACCT_ID == Urn) or (Can_urn == 1)
+    (CALLER_ID == Own) or (Allow == 1)
+
+    (Art_u * Rate >= Dust) or (Art_u == 0)
+
+iff in range int256
+
+    Ink_u
+    Art_u
+
+if
+
+    Urn == dst
+
+calls
+
+    Vat.fork-same
+```
+
 # Vat acts
 
 ```act
