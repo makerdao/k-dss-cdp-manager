@@ -31,8 +31,11 @@ rule #DssCdpManager.last[Usr] => #hashedLocation("Solidity", 7, Usr)
 syntax Int ::= "#DssCdpManager.count" "[" Int "]" [function]
 rule #DssCdpManager.count[Usr] => #hashedLocation("Solidity", 8, Usr)
 
-syntax Int ::= "#DssCdpManager.allows" "[" Int "][" Int "][" Int "]" [function]
-rule #DssCdpManager.allows[Lad][Cdp][Usr] => #hashedLocation("Solidity", 9, Lad Cdp Usr)
+syntax Int ::= "#DssCdpManager.cdpCan" "[" Int "][" Int "][" Int "]" [function]
+rule #DssCdpManager.cdpCan[Own][Cdp][Usr] => #hashedLocation("Solidity", 9, Own Cdp Usr)
+
+syntax Int ::= "#DssCdpManager.urnCan" "[" Int "][" Int "]" [function]
+rule #DssCdpManager.urnCan[Urn][Usr] => #hashedLocation("Solidity", 10, Urn Usr)
 
 ```
 

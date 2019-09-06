@@ -34,7 +34,7 @@ if
     #sizeWordStack(WS) <= 100
 ```
 
-```act
+```NOT READY
 behaviour open of DssCdpManager
 interface open(bytes32 ilk, address usr)
 
@@ -89,7 +89,7 @@ interface give(uint256 cdp, address dst)
 
 types
 
-    Allow               : uint256
+    CdpCan              : uint256
     Own                 : address
     CountOwn            : uint256
     CountDst            : uint256
@@ -105,7 +105,7 @@ types
 
 storage
 
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own => dst
     count[Own]                  |-> CountOwn => CountOwn - 1
     count[dst]                  |-> CountDst => CountDst + 1
@@ -115,8 +115,8 @@ storage
     first[dst]                  |-> FirstDst => #if FirstDst == 0 #then cdp #else FirstDst #fi
     list[cdp].prev              |-> ListCdpPrev => LastDst
     list[cdp].next              |-> ListCdpNext => 0
-    list[LastDst].next          |-> ListLastDstNext => cdp
-    list[ListCdpPrev].next      |-> ListListCdpPrevNext => ListCdpNext
+    list[LastDst].next          |-> ListLastDstNext => #if LastDst =/= 0 #then cdp #else ListLastDstNext #fi
+    list[ListCdpPrev].next      |-> ListListCdpPrevNext => #if ListCdpPrev =/= 0 #then ListCdpNext #else ListListCdpPrevNext #fi
     list[ListCdpNext].prev      |-> ListListCdpNextPrev => #if ListCdpNext =/= 0 #then ListCdpPrev #else ListListCdpNextPrev #fi
 
 iff in range uint256
@@ -127,7 +127,7 @@ iff in range uint256
 iff
 
     VCallValue == 0
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
     dst =/= 0
 
 if
@@ -150,18 +150,18 @@ interface give(uint256 cdp, address dst)
 
 types
 
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
 
 storage
 
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own => dst
 
 iff
 
     VCallValue == 0
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
     dst =/= 0
     Own =/= dst
 
@@ -182,7 +182,7 @@ interface flux(bytes32 ilk, uint256 cdp, address dst, uint256 wad)
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
     Urn     : address
     May     : uint256
@@ -192,7 +192,7 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
@@ -207,7 +207,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
 iff in range uint256
 
@@ -230,7 +230,7 @@ interface flux(bytes32 ilk, uint256 cdp, address dst, uint256 wad)
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
     Urn     : address
     May     : uint256
@@ -239,7 +239,7 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
@@ -253,7 +253,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
 iff in range uint256
 
@@ -275,7 +275,7 @@ interface flux(uint256 cdp, address dst, uint256 wad)
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
     Urn     : address
     Ilk     : bytes32
@@ -286,7 +286,7 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
     ilks[cdp]                   |-> Ilk
@@ -302,7 +302,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
 iff in range uint256
 
@@ -325,7 +325,7 @@ interface flux(uint256 cdp, address dst, uint256 wad)
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
     Urn     : address
     Ilk     : bytes32
@@ -335,7 +335,7 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
     ilks[cdp]                   |-> Ilk
@@ -350,7 +350,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
 iff in range uint256
 
@@ -372,7 +372,7 @@ interface move(uint256 cdp, address dst, uint256 rad)
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
     Urn     : address
     May     : uint256
@@ -382,7 +382,7 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
@@ -397,7 +397,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
 iff in range uint256
 
@@ -420,7 +420,7 @@ interface move(uint256 cdp, address dst, uint256 rad)
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
     Own     : address
     Urn     : address
     May     : uint256
@@ -429,7 +429,7 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
 
@@ -443,7 +443,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (May == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
 iff in range uint256
 
@@ -458,14 +458,15 @@ calls
     Vat.move-same
 ```
 
-```act
+```NOT READY
 behaviour quit-diff of DssCdpManager
 interface quit(uint256 cdp, address dst)
 
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
+    UrnCan  : uint256
     Own     : address
     Urn     : address
     Ilk     : bytes32
@@ -482,7 +483,8 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    urnCan[dst][CALLER_ID]      |-> UrnCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
     ilks[cdp]                   |-> Ilk
@@ -504,7 +506,8 @@ iff
     VCallDepth < 1024
     (ACCT_ID == Urn) or (Can_urn == 1)
     (ACCT_ID == dst) or (Can_dst == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
+    (CALLER_ID == dst) or (UrnCan == 1)
 
     (Art_v + Art_u) * Rate <= (Ink_v + Ink_u) * Spot
     ((Art_v + Art_u) * Rate >= Dust) or (Art_v + Art_u == 0)
@@ -529,14 +532,15 @@ calls
     Vat.fork-diff
 ```
 
-```act
+```NOT READY
 behaviour quit-same of DssCdpManager
 interface quit(uint256 cdp, address dst)
 
 types
 
     Vat     : address Vat
-    Allow   : uint256
+    CdpCan  : uint256
+    UrnCan  : uint256
     Own     : address
     Urn     : address
     Ilk     : bytes32
@@ -550,7 +554,8 @@ types
 storage
 
     vat                         |-> Vat
-    allows[Own][cdp][CALLER_ID] |-> Allow
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    urnCan[dst][CALLER_ID]      |-> UrnCan
     owns[cdp]                   |-> Own
     urns[cdp]                   |-> Urn
     ilks[cdp]                   |-> Ilk
@@ -569,7 +574,8 @@ iff
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (Can_urn == 1)
-    (CALLER_ID == Own) or (Allow == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
+    (CALLER_ID == dst) or (UrnCan == 1)
 
     (Art_u * Rate >= Dust) or (Art_u == 0)
 
