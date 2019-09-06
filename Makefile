@@ -6,7 +6,7 @@ specs: dapp
 dapp:
 	git submodule sync --recursive
 	git submodule update --init --recursive
-	cd dss-cdp-manager && dapp build
+	cd dss-cdp-manager && dapp --use solc:0.5.11 build
 
 .PHONY: clean
 clean:
