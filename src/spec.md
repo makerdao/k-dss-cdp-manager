@@ -14,7 +14,7 @@ iff in range uint256
 
 if
 
-    #sizeWordStack(WS) <= 100
+    #sizeWordStack(WS) <= 1000
 ```
 
 ```act
@@ -31,7 +31,88 @@ iff in range uint256
 
 if
 
-    #sizeWordStack(WS) <= 100
+    #sizeWordStack(WS) <= 1000
+```
+
+```act
+behaviour toInt of DssCdpManager
+interface toInt(uint256 x) internal
+
+stack
+
+    x : JMPTO : WS => JMPTO : #signed(x) : WS
+
+iff in range int256
+
+    x
+
+if
+
+    #sizeWordStack(WS) <= 1000
+```
+
+```act
+behaviour cdpAllow-diff of DssCdpManager
+interface cdpAllow(uint256 cdp, address usr, uint256 ok)
+
+types
+
+    CdpCan  : uint256
+    Own     : address
+
+storage
+
+    owns[cdp]                   |-> Own
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    cdpCan[Own][cdp][usr]       |-> _ => ok
+
+iff
+
+    VCallValue == 0
+    (CALLER_ID == Own) or (CdpCan == 1)
+
+if
+    CALLER_ID =/= usr
+```
+
+```act
+behaviour cdpAllow-same of DssCdpManager
+interface cdpAllow(uint256 cdp, address usr, uint256 ok)
+
+types
+
+    CdpCan  : uint256
+    Own     : address
+
+storage
+
+    owns[cdp]                   |-> Own
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan => ok
+
+iff
+
+    VCallValue == 0
+    (CALLER_ID == Own) or (CdpCan == 1)
+
+if
+    CALLER_ID == usr
+```
+
+```act
+behaviour urnAllow of DssCdpManager
+interface urnAllow(address usr, uint256 ok)
+
+types
+
+    UrnCan  : uint256
+
+storage
+
+    urnCan[CALLER_ID][usr] |-> _ => ok
+
+iff
+
+    VCallValue == 0
 ```
 
 ```NOT READY
@@ -529,6 +610,7 @@ if
 
 calls
 
+    DssCdpManager.toInt
     Vat.fork-diff
 ```
 
@@ -590,6 +672,7 @@ if
 
 calls
 
+    DssCdpManager.toInt
     Vat.fork-same
 ```
 
@@ -661,7 +744,7 @@ iff in range uint256
 
 if
 
-    #sizeWordStack(WS) <= 100
+    #sizeWordStack(WS) <= 1000
 ```
 
 ```act
@@ -678,7 +761,7 @@ iff in range uint256
 
 if
 
-    #sizeWordStack(WS) <= 100
+    #sizeWordStack(WS) <= 1000
 ```
 
 ```act
