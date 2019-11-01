@@ -1,5 +1,5 @@
 {
-    "name": "ds-cdp-manager",
+    "name": "k-dss-cdp-manager",
     "src": {
       "specification": "./src/spec.md",
       "smt_prelude": "./src/prelude.smt2.md",
