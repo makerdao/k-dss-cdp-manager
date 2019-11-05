@@ -539,7 +539,337 @@ calls
     Vat.move-same
 ```
 
-```NOT READY
+```act
+behaviour frob-nonzero of DssCdpManager
+interface frob(uint256 cdp, int dink, int dart)
+
+for all
+
+    Vat      : address Vat
+    CdpCan   : uint256
+    Own      : address
+    Urn      : address
+    Ilk      : bytes32
+    Ilk_rate : uint256
+    Ilk_line : uint256
+    Ilk_spot : uint256
+    Ilk_dust : uint256
+    Ilk_Art  : uint256
+    Urn_ink  : uint256
+    Urn_art  : uint256
+    Gem_iu   : uint256
+    Dai_u    : uint256
+    Debt     : uint256
+    Line     : uint256
+    Can_u    : uint256
+    Live     : uint256
+
+storage
+
+    vat                         |-> Vat
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    ilks[Ilk].rate          |-> Ilk_rate
+    ilks[Ilk].line          |-> Ilk_line
+    ilks[Ilk].spot          |-> Ilk_spot
+    ilks[Ilk].dust          |-> Ilk_dust
+    Line                    |-> Line
+    can[Urn][ACCT_ID]       |-> Can_u
+    urns[Ilk][Urn].ink      |-> Urn_ink  => Urn_ink + dink
+    urns[Ilk][Urn].art      |-> Urn_art  => Urn_art + dart
+    ilks[Ilk].Art           |-> Ilk_Art  => Ilk_Art + dart
+    gem[Ilk][Urn]           |-> Gem_iu   => Gem_iu  - dink
+    dai[Urn]                |-> Dai_u    => Dai_u + (Ilk_rate * dart)
+    debt                    |-> Debt     => Debt  + (Ilk_rate * dart)
+    live                    |-> Live
+
+iff in range uint256
+
+    Urn_ink + dink
+    Gem_iu  - dink
+    (Urn_ink + dink) * Ilk_spot
+    (Urn_art + dart) * Ilk_rate
+    (Ilk_Art + dart) * Ilk_rate
+    Dai_u + (Ilk_rate * dart)
+    Debt  + (Ilk_rate * dart)
+
+iff in range int256
+
+    Ilk_rate
+    Ilk_rate * dart
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+    (CALLER_ID == Own) or (CdpCan == 1)
+    Live == 1
+    Ilk_rate =/= 0
+    (dart <= 0) or (((Ilk_Art + dart) * Ilk_rate <= Ilk_line) and ((Debt + Ilk_rate * dart) <= Line))
+    (dart <= 0 and dink >= 0) or ((((Urn_art + dart) * Ilk_rate) <= ((Urn_ink + dink) * Ilk_spot)))
+    (u == ACCT_ID or Can_u == 1)
+    ((Urn_art + dart) == 0) or (((Urn_art + dart) * Ilk_rate) >= Ilk_dust)
+
+if
+
+    dink =/= 0
+    dart =/= 0
+
+calls
+
+    Vat.frob-same-nonzero
+```
+
+```act
+behaviour frob-zero-dart of DssCdpManager
+interface frob(uint256 cdp, int dink, int dart)
+
+for all
+
+    Vat      : address Vat
+    CdpCan   : uint256
+    Own      : address
+    Urn      : address
+    Ilk      : bytes32
+    Ilk_rate : uint256
+    Ilk_line : uint256
+    Ilk_spot : uint256
+    Ilk_dust : uint256
+    Ilk_Art  : uint256
+    Urn_ink  : uint256
+    Urn_art  : uint256
+    Gem_iu   : uint256
+    Dai_u    : uint256
+    Debt     : uint256
+    Line     : uint256
+    Can_u    : uint256
+    Live     : uint256
+
+storage
+
+    vat                         |-> Vat
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    ilks[Ilk].rate      |-> Ilk_rate
+    ilks[Ilk].line      |-> Ilk_line
+    ilks[Ilk].spot      |-> Ilk_spot
+    ilks[Ilk].dust      |-> Ilk_dust
+    Line                |-> Line
+    can[Urn][ACCT_ID]   |-> Can_u
+    urns[Ilk][Urn].ink  |-> Urn_ink  => Urn_ink + dink
+    urns[Ilk][Urn].art  |-> Urn_art  => Urn_art
+    ilks[Ilk].Art       |-> Ilk_Art  => Ilk_Art
+    gem[Ilk][Urn]       |-> Gem_iu   => Gem_iu  - dink
+    dai[Urn]            |-> Dai_u    => Dai_u
+    debt                |-> Debt     => Debt
+    live                |-> Live
+
+iff in range uint256
+
+    Urn_ink + dink
+    Gem_iu  - dink
+    (Urn_ink + dink) * Ilk_spot
+    Urn_art * Ilk_rate
+    Ilk_Art * Ilk_rate
+
+iff in range int256
+
+    Ilk_rate
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+    (CALLER_ID == Own) or (CdpCan == 1)
+    Live == 1
+    Ilk_rate =/= 0
+    (dink >= 0) or (((Urn_art * Ilk_rate) <= ((Urn_ink + dink) * Ilk_spot)))
+    (u == ACCT_ID or Can_u == 1)
+    (Urn_art == 0) or ((Urn_art * Ilk_rate) >= Ilk_dust)
+
+if
+
+    dink =/= 0
+    dart == 0
+
+calls
+
+    Vat.frob-same-zero-dart
+```
+
+```act
+behaviour frob-zero-dink of DssCdpManager
+interface frob(uint256 cdp, int dink, int dart)
+
+for all
+
+    Vat      : address Vat
+    CdpCan   : uint256
+    Own      : address
+    Urn      : address
+    Ilk      : bytes32
+    Ilk_rate : uint256
+    Ilk_line : uint256
+    Ilk_spot : uint256
+    Ilk_dust : uint256
+    Ilk_Art  : uint256
+    Urn_ink  : uint256
+    Urn_art  : uint256
+    Gem_iu   : uint256
+    Dai_u    : uint256
+    Debt     : uint256
+    Line     : uint256
+    Can_u    : uint256
+    Live     : uint256
+
+storage
+
+    vat                         |-> Vat
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    ilks[Ilk].rate      |-> Ilk_rate
+    ilks[Ilk].line      |-> Ilk_line
+    ilks[Ilk].spot      |-> Ilk_spot
+    ilks[Ilk].dust      |-> Ilk_dust
+    Line                |-> Line
+    can[Urn][ACCT_ID]   |-> Can_u
+    urns[Ilk][Urn].ink  |-> Urn_ink  => Urn_ink
+    urns[Ilk][Urn].art  |-> Urn_art  => Urn_art + dart
+    ilks[Ilk].Art       |-> Ilk_Art  => Ilk_Art + dart
+    gem[Ilk][Urn]       |-> Gem_iu   => Gem_iu
+    dai[Urn]            |-> Dai_u    => Dai_u + (Ilk_rate * dart)
+    debt                |-> Debt     => Debt  + (Ilk_rate * dart)
+    live                |-> Live
+
+iff in range uint256
+
+    Urn_ink * Ilk_spot
+    (Urn_art + dart) * Ilk_rate
+    (Ilk_Art + dart) * Ilk_rate
+    Dai_u + (Ilk_rate * dart)
+    Debt  + (Ilk_rate * dart)
+
+iff in range int256
+
+    Ilk_rate
+    Ilk_rate * dart
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+    (CALLER_ID == Own) or (CdpCan == 1)
+    Live == 1
+    Ilk_rate =/= 0
+    (dart <= 0) or (((Ilk_Art + dart) * Ilk_rate <= Ilk_line) and ((Debt + Ilk_rate * dart) <= Line))
+    (dart <= 0) or (((Urn_art + dart) * Ilk_rate) <= (Urn_ink * Ilk_spot))
+    (u == ACCT_ID or Can_u == 1)
+    ((Urn_art + dart) == 0) or (((Urn_art + dart) * Ilk_rate) >= Ilk_dust)
+
+if
+
+    dink == 0
+    dart =/= 0
+
+calls
+
+    Vat.frob-same-zero-dink
+````
+
+```act
+behaviour frob-zero of DssCdpManager
+interface frob(uint256 cdp, int dink, int dart)
+
+for all
+
+    Vat      : address Vat
+    CdpCan   : uint256
+    Own      : address
+    Urn      : address
+    Ilk      : bytes32
+    Ilk_rate : uint256
+    Ilk_line : uint256
+    Ilk_spot : uint256
+    Ilk_dust : uint256
+    Ilk_Art  : uint256
+    Urn_ink  : uint256
+    Urn_art  : uint256
+    Gem_iu   : uint256
+    Dai_u    : uint256
+    Debt     : uint256
+    Line     : uint256
+    Can_u    : uint256
+    Live     : uint256
+
+storage
+
+    vat                         |-> Vat
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    ilks[Ilk].rate      |-> Ilk_rate
+    ilks[Ilk].line      |-> Ilk_line
+    ilks[Ilk].spot      |-> Ilk_spot
+    ilks[Ilk].dust      |-> Ilk_dust
+    Line                |-> Line
+    can[Urn][ACCT_ID]   |-> Can_u
+    urns[Ilk][Urn].ink  |-> Urn_ink  => Urn_ink
+    urns[Ilk][Urn].art  |-> Urn_art  => Urn_art
+    ilks[Ilk].Art       |-> Ilk_Art  => Ilk_Art
+    gem[Ilk][Urn]       |-> Gem_iu   => Gem_iu
+    dai[Urn]            |-> Dai_u    => Dai_u
+    debt                |-> Debt     => Debt
+    live                |-> Live
+
+iff in range uint256
+
+    Urn_ink * Ilk_spot
+    Urn_art * Ilk_rate
+    Ilk_Art * Ilk_rate
+
+iff in range int256
+
+    Ilk_rate
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+    (CALLER_ID == Own) or (CdpCan == 1)
+    Live == 1
+    Ilk_rate =/= 0
+    (Urn_art == 0) or ((Urn_art * Ilk_rate) >= Ilk_dust)
+
+if
+
+    dink == 0
+    dart == 0
+
+calls
+
+    Vat.frob-same-zero
+```
+
+```act
 behaviour quit-diff of DssCdpManager
 interface quit(uint256 cdp, address dst)
 
@@ -583,6 +913,7 @@ storage Vat
     urns[Ilk][dst].art  |-> Art_v => Art_v + Art_u
 
 iff
+
     VCallValue == 0
     VCallDepth < 1024
     (ACCT_ID == Urn) or (Can_urn == 1)
@@ -614,7 +945,7 @@ calls
     Vat.fork-diff
 ```
 
-```NOT READY
+```act
 behaviour quit-same of DssCdpManager
 interface quit(uint256 cdp, address dst)
 
@@ -659,6 +990,7 @@ iff
     (CALLER_ID == Own) or (CdpCan == 1)
     (CALLER_ID == dst) or (UrnCan == 1)
 
+    Art_u * Rate <= Ink_u * Spot
     (Art_u * Rate >= Dust) or (Art_u == 0)
 
 iff in range int256
@@ -934,324 +1266,6 @@ calls
 
     Vat.subuu
     Vat.adduu
-```
-
-```act
-behaviour frob-diff-nonzero of Vat
-interface frob(bytes32 i, address u, address v, address w, int dink, int dart)
-
-for all
-
-    Ilk_rate : uint256
-    Ilk_line : uint256
-    Ilk_spot : uint256
-    Ilk_dust : uint256
-    Ilk_Art  : uint256
-    Urn_ink  : uint256
-    Urn_art  : uint256
-    Gem_iv   : uint256
-    Dai_w    : uint256
-    Debt     : uint256
-    Line     : uint256
-    Can_u    : uint256
-    Can_v    : uint256
-    Can_w    : uint256
-    Live     : uint256
-
-storage
-
-    ilks[i].rate      |-> Ilk_rate
-    ilks[i].line      |-> Ilk_line
-    ilks[i].spot      |-> Ilk_spot
-    ilks[i].dust      |-> Ilk_dust
-    Line              |-> Line
-    can[u][CALLER_ID] |-> Can_u
-    can[v][CALLER_ID] |-> Can_v
-    can[w][CALLER_ID] |-> Can_w
-    urns[i][u].ink    |-> Urn_ink  => Urn_ink + dink
-    urns[i][u].art    |-> Urn_art  => Urn_art + dart
-    ilks[i].Art       |-> Ilk_Art  => Ilk_Art + dart
-    gem[i][v]         |-> Gem_iv   => Gem_iv  - dink
-    dai[w]            |-> Dai_w    => Dai_w + (Ilk_rate * dart)
-    debt              |-> Debt     => Debt  + (Ilk_rate * dart)
-    live              |-> Live
-
-iff in range uint256
-
-    Urn_ink + dink
-    Gem_iv  - dink
-    (Urn_ink + dink) * Ilk_spot
-    (Urn_art + dart) * Ilk_rate
-    (Ilk_Art + dart) * Ilk_rate
-    Dai_w + (Ilk_rate * dart)
-    Debt  + (Ilk_rate * dart)
-
-iff in range int256
-
-    Ilk_rate
-    Ilk_rate * dart
-
-iff
-
-    VCallValue == 0
-    Live == 1
-    Ilk_rate =/= 0
-
-    (dart <= 0) or (((Ilk_Art + dart) * Ilk_rate <= Ilk_line) and ((Debt + Ilk_rate * dart) <= Line))
-    (dart <= 0 and dink >= 0) or ((((Urn_art + dart) * Ilk_rate) <= ((Urn_ink + dink) * Ilk_spot)))
-    (dart <= 0 and dink >= 0) or (u == CALLER_ID or Can_u == 1)
-
-    (dink <= 0) or (v == CALLER_ID or Can_v == 1)
-    (dart >= 0) or (w == CALLER_ID or Can_w == 1)
-
-    ((Urn_art + dart) == 0) or (((Urn_art + dart) * Ilk_rate) >= Ilk_dust)
-
-if
-
-    u =/= v
-    v =/= w
-    u =/= w
-    dink =/= 0
-    dart =/= 0
-
-calls
-
-    Vat.addui
-    Vat.subui
-    Vat.mului
-    Vat.muluu
-```
-
-```act
-behaviour frob-diff-zero-dart of Vat
-interface frob(bytes32 i, address u, address v, address w, int dink, int dart)
-
-for all
-
-    Ilk_rate : uint256
-    Ilk_line : uint256
-    Ilk_spot : uint256
-    Ilk_dust : uint256
-    Ilk_Art  : uint256
-    Urn_ink  : uint256
-    Urn_art  : uint256
-    Gem_iv   : uint256
-    Dai_w    : uint256
-    Debt     : uint256
-    Line     : uint256
-    Can_u    : uint256
-    Can_v    : uint256
-    Can_w    : uint256
-    Live     : uint256
-
-storage
-
-    ilks[i].rate      |-> Ilk_rate
-    ilks[i].line      |-> Ilk_line
-    ilks[i].spot      |-> Ilk_spot
-    ilks[i].dust      |-> Ilk_dust
-    Line              |-> Line
-    can[u][CALLER_ID] |-> Can_u
-    can[v][CALLER_ID] |-> Can_v
-    can[w][CALLER_ID] |-> Can_w
-    urns[i][u].ink    |-> Urn_ink  => Urn_ink + dink
-    urns[i][u].art    |-> Urn_art  => Urn_art
-    ilks[i].Art       |-> Ilk_Art  => Ilk_Art
-    gem[i][v]         |-> Gem_iv   => Gem_iv  - dink
-    dai[w]            |-> Dai_w    => Dai_w
-    debt              |-> Debt     => Debt
-    live              |-> Live
-
-iff in range uint256
-
-    Urn_ink + dink
-    Gem_iv  - dink
-    (Urn_ink + dink) * Ilk_spot
-    Urn_art * Ilk_rate
-    Ilk_Art * Ilk_rate
-
-iff in range int256
-
-    Ilk_rate
-
-iff
-
-    VCallValue == 0
-    Live == 1
-    Ilk_rate =/= 0
-    (dink >= 0) or (((Urn_art * Ilk_rate) <= ((Urn_ink + dink) * Ilk_spot)))
-    (dink >= 0) or (u == CALLER_ID or Can_u == 1)
-    (dink <= 0) or (v == CALLER_ID or Can_v == 1)
-    (Urn_art == 0) or ((Urn_art * Ilk_rate) >= Ilk_dust)
-
-if
-
-    u =/= v
-    v =/= w
-    u =/= w
-    dink =/= 0
-    dart == 0
-
-calls
-
-    Vat.addui
-    Vat.subui
-    Vat.mului
-    Vat.muluu
-```
-
-```act
-behaviour frob-diff-zero-dink of Vat
-interface frob(bytes32 i, address u, address v, address w, int dink, int dart)
-
-for all
-
-    Ilk_rate : uint256
-    Ilk_line : uint256
-    Ilk_spot : uint256
-    Ilk_dust : uint256
-    Ilk_Art  : uint256
-    Urn_ink  : uint256
-    Urn_art  : uint256
-    Gem_iv   : uint256
-    Dai_w    : uint256
-    Debt     : uint256
-    Line     : uint256
-    Can_u    : uint256
-    Can_v    : uint256
-    Can_w    : uint256
-    Live     : uint256
-
-storage
-
-    ilks[i].rate      |-> Ilk_rate
-    ilks[i].line      |-> Ilk_line
-    ilks[i].spot      |-> Ilk_spot
-    ilks[i].dust      |-> Ilk_dust
-    Line              |-> Line
-    can[u][CALLER_ID] |-> Can_u
-    can[v][CALLER_ID] |-> Can_v
-    can[w][CALLER_ID] |-> Can_w
-    urns[i][u].ink    |-> Urn_ink  => Urn_ink
-    urns[i][u].art    |-> Urn_art  => Urn_art + dart
-    ilks[i].Art       |-> Ilk_Art  => Ilk_Art + dart
-    gem[i][v]         |-> Gem_iv   => Gem_iv
-    dai[w]            |-> Dai_w    => Dai_w + (Ilk_rate * dart)
-    debt              |-> Debt     => Debt  + (Ilk_rate * dart)
-    live              |-> Live
-
-iff in range uint256
-
-    Urn_art + dart
-    Urn_ink * Ilk_spot
-    (Urn_art + dart) * Ilk_rate
-    (Ilk_Art + dart) * Ilk_rate
-    Dai_w + (Ilk_rate * dart)
-    Debt  + (Ilk_rate * dart)
-
-iff in range int256
-
-    Ilk_rate
-    Ilk_rate * dart
-
-iff
-
-    VCallValue == 0
-    Live == 1
-    Ilk_rate =/= 0
-
-    (dart <= 0) or (((Ilk_Art + dart) * Ilk_rate <= Ilk_line) and ((Debt + Ilk_rate * dart) <= Line))
-    (dart <= 0) or (((Urn_art + dart) * Ilk_rate) <= (Urn_ink * Ilk_spot))
-    (dart <= 0) or (u == CALLER_ID or Can_u == 1)
-    (dart >= 0) or (w == CALLER_ID or Can_w == 1)
-    ((Urn_art + dart) == 0) or (((Urn_art + dart) * Ilk_rate) >= Ilk_dust)
-
-if
-
-    u =/= v
-    v =/= w
-    u =/= w
-    dink == 0
-    dart =/= 0
-
-calls
-
-    Vat.addui
-    Vat.subui
-    Vat.mului
-    Vat.muluu
-```
-
-```act
-behaviour frob-diff-zero of Vat
-interface frob(bytes32 i, address u, address v, address w, int dink, int dart)
-
-for all
-
-    Ilk_rate : uint256
-    Ilk_line : uint256
-    Ilk_spot : uint256
-    Ilk_dust : uint256
-    Ilk_Art  : uint256
-    Urn_ink  : uint256
-    Urn_art  : uint256
-    Gem_iv   : uint256
-    Dai_w    : uint256
-    Debt     : uint256
-    Line     : uint256
-    Can_u    : uint256
-    Can_v    : uint256
-    Can_w    : uint256
-    Live     : uint256
-
-storage
-
-    ilks[i].rate      |-> Ilk_rate
-    ilks[i].line      |-> Ilk_line
-    ilks[i].spot      |-> Ilk_spot
-    ilks[i].dust      |-> Ilk_dust
-    Line              |-> Line
-    can[u][CALLER_ID] |-> Can_u
-    can[v][CALLER_ID] |-> Can_v
-    can[w][CALLER_ID] |-> Can_w
-    urns[i][u].ink    |-> Urn_ink  => Urn_ink
-    urns[i][u].art    |-> Urn_art  => Urn_art
-    ilks[i].Art       |-> Ilk_Art  => Ilk_Art
-    gem[i][v]         |-> Gem_iv   => Gem_iv
-    dai[w]            |-> Dai_w    => Dai_w
-    debt              |-> Debt     => Debt
-    live              |-> Live
-
-iff in range uint256
-
-    Urn_ink * Ilk_spot
-    Urn_art * Ilk_rate
-    Ilk_Art * Ilk_rate
-
-iff in range int256
-
-    Ilk_rate
-
-iff
-    VCallValue == 0
-    Live == 1
-    Ilk_rate =/= 0
-    (Urn_art == 0) or ((Urn_art * Ilk_rate) >= Ilk_dust)
-
-if
-
-    u =/= v
-    v =/= w
-    u =/= w
-    dink == 0
-    dart == 0
-
-calls
-
-    Vat.addui
-    Vat.subui
-    Vat.mului
-    Vat.muluu
 ```
 
 ```act
