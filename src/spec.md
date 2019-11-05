@@ -1127,11 +1127,12 @@ iff
 
     VCallValue == 0
     VCallDepth < 1024
-    (ACCT_ID == Urn) or (Can_urn == 1)
-    (ACCT_ID == dst) or (Can_dst == 1)
+
     (CALLER_ID == Own) or (CdpCan == 1)
     (CALLER_ID == dst) or (UrnCan == 1)
 
+    (ACCT_ID == Urn) or (Can_urn == 1)
+    (ACCT_ID == dst) or (Can_dst == 1)
     (Art_v + Art_u) * Rate <= (Ink_v + Ink_u) * Spot
     ((Art_v + Art_u) * Rate >= Dust) or (Art_v + Art_u == 0)
 
@@ -1197,12 +1198,17 @@ iff
 
     VCallValue == 0
     VCallDepth < 1024
-    (ACCT_ID == Urn) or (Can_urn == 1)
+
     (CALLER_ID == Own) or (CdpCan == 1)
     (CALLER_ID == dst) or (UrnCan == 1)
 
+    (ACCT_ID == Urn) or (Can_urn == 1)
     Art_u * Rate <= Ink_u * Spot
     (Art_u * Rate >= Dust) or (Art_u == 0)
+
+iff in range uint256
+
+    Ink_u * Spot
 
 iff in range int256
 
@@ -1217,6 +1223,301 @@ calls
 
     DssCdpManager.toInt
     Vat.fork-same
+```
+
+```act
+behaviour enter-diff of DssCdpManager
+interface enter(address src, uint256 cdp)
+
+types
+
+    Vat     : address Vat
+    UrnCan  : uint256
+    CdpCan  : uint256
+    Own     : address
+    Urn     : address
+    Ilk     : bytes32
+    Can_src : uint256
+    Can_urn : uint256
+    Rate    : uint256
+    Spot    : uint256
+    Dust    : uint256
+    Ink_u   : uint256
+    Art_u   : uint256
+    Ink_v   : uint256
+    Art_v   : uint256
+
+storage
+
+    vat                         |-> Vat
+    urnCan[src][CALLER_ID]      |-> UrnCan
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    can[src][ACCT_ID]   |-> Can_src
+    can[Urn][ACCT_ID]   |-> Can_urn
+    ilks[Ilk].rate      |-> Rate
+    ilks[Ilk].spot      |-> Spot
+    ilks[Ilk].dust      |-> Dust
+    urns[Ilk][src].ink  |-> Ink_u => 0
+    urns[Ilk][src].art  |-> Art_u => 0
+    urns[Ilk][Urn].ink  |-> Ink_v => Ink_v + Ink_u
+    urns[Ilk][Urn].art  |-> Art_v => Art_v + Art_u
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+
+    (CALLER_ID == Own) or (CdpCan == 1)
+    (CALLER_ID == src) or (UrnCan == 1)
+
+    (ACCT_ID == src) or (Can_src == 1)
+    (ACCT_ID == Urn) or (Can_urn == 1)
+    (Art_v + Art_u) * Rate <= (Ink_v + Ink_u) * Spot
+    ((Art_v + Art_u) * Rate >= Dust) or (Art_v + Art_u == 0)
+
+iff in range uint256
+
+    Ink_v + Ink_u
+    Art_v + Art_u
+    (Ink_v + Ink_u) * Spot
+
+iff in range int256
+
+    Ink_u
+    Art_u
+
+if
+
+    Urn =/= dst
+
+calls
+
+    DssCdpManager.toInt
+    Vat.fork-diff
+```
+
+```act
+behaviour enter-same of DssCdpManager
+interface enter(address src, uint256 cdp)
+
+types
+
+    Vat     : address Vat
+    UrnCan  : uint256
+    CdpCan  : uint256
+    Own     : address
+    Urn     : address
+    Ilk     : bytes32
+    Can_urn : uint256
+    Rate    : uint256
+    Spot    : uint256
+    Dust    : uint256
+    Ink_u   : uint256
+    Art_u   : uint256
+
+storage
+
+    vat                         |-> Vat
+    urnCan[src][CALLER_ID]      |-> UrnCan
+    cdpCan[Own][cdp][CALLER_ID] |-> CdpCan
+    owns[cdp]                   |-> Own
+    urns[cdp]                   |-> Urn
+    ilks[cdp]                   |-> Ilk
+
+storage Vat
+
+    can[src][ACCT_ID]   |-> Can_urn
+    ilks[Ilk].rate      |-> Rate
+    ilks[Ilk].spot      |-> Spot
+    ilks[Ilk].dust      |-> Dust
+    urns[Ilk][src].ink  |-> Ink_u => Ink_u
+    urns[Ilk][src].art  |-> Art_u => Art_u
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+
+    (CALLER_ID == dst) or (UrnCan == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
+
+    (ACCT_ID == Urn) or (Can_urn == 1)
+    Art_u * Rate <= Ink_u * Spot
+    (Art_u * Rate >= Dust) or (Art_u == 0)
+
+iff in range uint256
+
+    Ink_u * Spot
+
+iff in range int256
+
+    Ink_u
+    Art_u
+
+if
+
+    Urn == src
+
+calls
+
+    DssCdpManager.toInt
+    Vat.fork-same
+```
+
+```act
+behaviour shift-diff of DssCdpManager
+interface shift(uint256 cdpSrc, uint256 cdpDst)
+
+types
+
+    Vat         : address Vat
+    CdpSrcCan   : uint256
+    CdpDstCan   : uint256
+    OwnSrc      : address
+    OwnDst      : address
+    UrnSrc      : address
+    UrnDst      : address
+    IlkSrc      : bytes32
+    IlkDst      : bytes32
+    Can_urn_src : uint256
+    Can_urn_dst : uint256
+    Rate        : uint256
+    Spot        : uint256
+    Dust        : uint256
+    Ink_u       : uint256
+    Art_u       : uint256
+    Ink_v       : uint256
+    Art_v       : uint256
+
+storage
+
+    vat                             |-> Vat
+    cdpCan[Own][cdpSrc][CALLER_ID]  |-> CdpSrcCan
+    cdpCan[Own][cdpDst][CALLER_ID]  |-> CdpDstCan
+    owns[cdpSrc]                    |-> OwnSrc
+    owns[cdpDst]                    |-> OwnDst
+    urns[cdpSrc]                    |-> UrnSrc
+    urns[cdpDst]                    |-> UrnDst
+    ilks[cdpSrc]                    |-> IlkSrc
+    ilks[cdpDst]                    |-> IlkDst
+
+storage Vat
+
+    can[UrnSrc][ACCT_ID]        |-> Can_urn_src
+    can[UrnDst][ACCT_ID]        |-> Can_urn_dst
+    ilks[IlkSrc].rate           |-> Rate
+    ilks[IlkSrc].spot           |-> Spot
+    ilks[IlkSrc].dust           |-> Dust
+    urns[IlkSrc][UrnSrc].ink    |-> Ink_u => 0
+    urns[IlkSrc][UrnSrc].art    |-> Art_u => 0
+    urns[IlkSrc][UrnDst].ink    |-> Ink_v => Ink_v + Ink_u
+    urns[IlkSrc][UrnDst].art    |-> Art_v => Art_v + Art_u
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+
+    (CALLER_ID == OwnSrc) or (CdpSrcCan == 1)
+    (CALLER_ID == OwnDst) or (CdpDstCan == 1)
+    IlkSrc == IlkDst
+
+    (ACCT_ID == UrnSrc) or (Can_urn_src == 1)
+    (ACCT_ID == UrnDst) or (Can_urn_dst == 1)
+    (Art_v + Art_u) * Rate <= (Ink_v + Ink_u) * Spot
+    ((Art_v + Art_u) * Rate >= Dust) or (Art_v + Art_u == 0)
+
+iff in range uint256
+
+    Ink_v + Ink_u
+    Art_v + Art_u
+    (Ink_v + Ink_u) * Spot
+
+iff in range int256
+
+    Ink_u
+    Art_u
+
+if
+
+    cdpSrc =/= cdpDst
+    UrnSrc =/= UrnDst
+
+calls
+
+    DssCdpManager.toInt
+    Vat.fork-diff
+```
+
+```act
+behaviour shift-same of DssCdpManager
+interface shift(uint256 cdpSrc, uint256 cdpDst)
+
+types
+
+    Vat         : address Vat
+    CdpSrcCan   : uint256
+    OwnSrc      : address
+    UrnSrc      : address
+    IlkSrc      : bytes32
+    Can_urn_src : uint256
+    Rate        : uint256
+    Spot        : uint256
+    Dust        : uint256
+    Ink_u       : uint256
+    Art_u       : uint256
+
+storage
+
+    vat                             |-> Vat
+    cdpCan[Own][cdpSrc][CALLER_ID]  |-> CdpSrcCan
+    owns[cdpSrc]                    |-> OwnSrc
+    urns[cdpSrc]                    |-> UrnSrc
+    ilks[cdpSrc]                    |-> IlkSrc
+
+storage Vat
+
+    can[UrnSrc][ACCT_ID]        |-> Can_urn_src
+    ilks[IlkSrc].rate           |-> Rate
+    ilks[IlkSrc].spot           |-> Spot
+    ilks[IlkSrc].dust           |-> Dust
+    urns[IlkSrc][UrnSrc].ink    |-> Ink_u => Ink_u
+    urns[IlkSrc][UrnSrc].art    |-> Art_u => Art_u
+
+iff
+
+    VCallValue == 0
+    VCallDepth < 1024
+
+    (CALLER_ID == OwnSrc) or (CdpSrcCan == 1)
+
+    (ACCT_ID == UrnSrc) or (Can_urn_src == 1)
+    Art_u * Rate <= (Ink_u) * Spot
+    (Art_u * Rate >= Dust) or (Art_u == 0)
+
+iff in range uint256
+
+    Ink_u * Spot
+
+iff in range int256
+
+    Ink_u
+    Art_u
+
+if
+
+    cdpSrc == cdpDst
+
+calls
+
+    DssCdpManager.toInt
+    Vat.fork-diff
 ```
 
 # Vat acts
