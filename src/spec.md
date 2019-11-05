@@ -52,6 +52,217 @@ if
 ```
 
 ```act
+behaviour vat of DssCdpManager
+interface vat()
+
+for all
+
+    Vat : address
+
+storage
+
+    vat |-> Vat
+
+iff
+
+    VCallValue == 0
+
+returns Vat
+```
+
+```act
+behaviour cdpi of DssCdpManager
+interface cdpi()
+
+for all
+
+    Cdpi : uint256
+
+storage
+
+    cdpi |-> Cdpi
+
+iff
+
+    VCallValue == 0
+
+returns Cdpi
+```
+
+```act
+behaviour urns of DssCdpManager
+interface urns(uint256 cdp)
+
+for all
+
+    Urn : address
+
+storage
+
+    urns[cdp] |-> Urn
+
+iff
+
+    VCallValue == 0
+
+returns Urn
+```
+
+```act
+behaviour list of DssCdpManager
+interface list(uint256 cdp)
+
+for all
+
+    Prev : uint256
+    Next : uint256
+
+storage
+
+    list[cdp].prev |-> Prev
+    list[cdp].next |-> Next
+
+iff
+
+    VCallValue == 0
+
+returns Prev : Next
+```
+
+```act
+behaviour owns of DssCdpManager
+interface owns(uint256 cdp)
+
+for all
+
+    Own : address
+
+storage
+
+    owns[cdp] |-> Own
+
+iff
+
+    VCallValue == 0
+
+returns Own
+```
+
+```act
+behaviour ilks of DssCdpManager
+interface ilks(uint256 cdp)
+
+for all
+
+    Ilk : bytes32
+
+storage
+
+    ilks[cdp] |-> Ilk
+
+iff
+
+    VCallValue == 0
+
+returns Ilk
+```
+
+```act
+behaviour first of DssCdpManager
+interface first(address own)
+
+for all
+
+    First : uint256
+
+storage
+
+    first[own] |-> First
+
+iff
+
+    VCallValue == 0
+
+returns First
+```
+
+```act
+behaviour last of DssCdpManager
+interface last(address own)
+
+for all
+
+    Last : uint256
+
+storage
+
+    last[own] |-> Last
+
+iff
+
+    VCallValue == 0
+
+returns Last
+```
+
+```act
+behaviour count of DssCdpManager
+interface count(address own)
+
+for all
+
+    Count : uint256
+
+storage
+
+    count[own] |-> Count
+
+iff
+
+    VCallValue == 0
+
+returns Count
+```
+
+```act
+behaviour cdpCan of DssCdpManager
+interface cdpCan(address own, uint256 cdp, address who)
+
+for all
+
+    Can : uint256
+
+storage
+
+    cdpCan[own][cdp][who] |-> Can
+
+iff
+
+    VCallValue == 0
+
+returns Can
+```
+
+```act
+behaviour urnCan of DssCdpManager
+interface urnCan(address urn, address who)
+
+for all
+
+    Can : uint256
+
+storage
+
+    urnCan[urn][who] |-> Can
+
+iff
+
+    VCallValue == 0
+
+returns Can
+```
+
+```act
 behaviour cdpAllow-diff of DssCdpManager
 interface cdpAllow(uint256 cdp, address usr, uint256 ok)
 
