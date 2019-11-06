@@ -818,12 +818,14 @@ iff
 
     VCallValue == 0
     VCallDepth < 1024
+
     (CALLER_ID == Own) or (CdpCan == 1)
+
     Live == 1
     Ilk_rate =/= 0
     (dart <= 0) or (((Ilk_Art + dart) * Ilk_rate <= Ilk_line) and ((Debt + Ilk_rate * dart) <= Line))
     (dart <= 0 and dink >= 0) or ((((Urn_art + dart) * Ilk_rate) <= ((Urn_ink + dink) * Ilk_spot)))
-    (u == ACCT_ID or Can_u == 1)
+    (Urn == ACCT_ID or Can_u == 1)
     ((Urn_art + dart) == 0) or (((Urn_art + dart) * Ilk_rate) >= Ilk_dust)
 
 if
@@ -901,11 +903,13 @@ iff
 
     VCallValue == 0
     VCallDepth < 1024
+
     (CALLER_ID == Own) or (CdpCan == 1)
+
     Live == 1
     Ilk_rate =/= 0
     (dink >= 0) or (((Urn_art * Ilk_rate) <= ((Urn_ink + dink) * Ilk_spot)))
-    (u == ACCT_ID or Can_u == 1)
+    (Urn == ACCT_ID or Can_u == 1)
     (Urn_art == 0) or ((Urn_art * Ilk_rate) >= Ilk_dust)
 
 if
@@ -984,12 +988,14 @@ iff
 
     VCallValue == 0
     VCallDepth < 1024
+
     (CALLER_ID == Own) or (CdpCan == 1)
+
     Live == 1
     Ilk_rate =/= 0
     (dart <= 0) or (((Ilk_Art + dart) * Ilk_rate <= Ilk_line) and ((Debt + Ilk_rate * dart) <= Line))
     (dart <= 0) or (((Urn_art + dart) * Ilk_rate) <= (Urn_ink * Ilk_spot))
-    (u == ACCT_ID or Can_u == 1)
+    (Urn == ACCT_ID or Can_u == 1)
     ((Urn_art + dart) == 0) or (((Urn_art + dart) * Ilk_rate) >= Ilk_dust)
 
 if
@@ -1065,7 +1071,9 @@ iff
 
     VCallValue == 0
     VCallDepth < 1024
+
     (CALLER_ID == Own) or (CdpCan == 1)
+
     Live == 1
     Ilk_rate =/= 0
     (Urn_art == 0) or ((Urn_art * Ilk_rate) >= Ilk_dust)
