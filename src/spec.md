@@ -1273,8 +1273,8 @@ iff
     VCallValue == 0
     VCallDepth < 1024
 
-    (CALLER_ID == Own) or (CdpCan == 1)
     (CALLER_ID == src) or (UrnCan == 1)
+    (CALLER_ID == Own) or (CdpCan == 1)
 
     (ACCT_ID == src) or (Can_src == 1)
     (ACCT_ID == Urn) or (Can_urn == 1)
@@ -1294,7 +1294,7 @@ iff in range int256
 
 if
 
-    Urn =/= dst
+    Urn =/= src
 
 calls
 
@@ -1344,7 +1344,7 @@ iff
     VCallValue == 0
     VCallDepth < 1024
 
-    (CALLER_ID == dst) or (UrnCan == 1)
+    (CALLER_ID == src) or (UrnCan == 1)
     (CALLER_ID == Own) or (CdpCan == 1)
 
     (ACCT_ID == Urn) or (Can_urn == 1)
