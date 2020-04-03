@@ -326,7 +326,7 @@ iff
     VCallValue == 0
 ```
 
-```NOT READY
+```act
 behaviour open of DssCdpManager
 interface open(bytes32 ilk, address usr)
 
@@ -334,8 +334,7 @@ types
 
     Vat     : address Vat
     Cdpi    : uint256
-    Urn     : address
-    NewUrn  : address
+    Urn     : address UrnHandler
     Last    : uint256
     Count   : uint256
     Own     : address
@@ -344,11 +343,17 @@ types
     Prev    : uint256
     Next    : uint256
 
+creates storage Urn
+
+storage Vat
+
+    can[Urn][ACCT_ID]   |-> 0 => 1
+
 storage
 
     vat                 |-> Vat
     cdpi                |-> Cdpi => Cdpi + 1
-    urns[Cdpi + 1]      |-> Urn => NewUrn
+    urns[Cdpi + 1]      |-> 0 => Urn
     last[usr]           |-> Last => Cdpi + 1
     count[usr]          |-> Count => Count + 1
     owns[Cdpi + 1]      |-> Own => usr
@@ -366,13 +371,14 @@ iff
 
     VCallValue == 0
     usr =/= 0
+    VCallDepth < 1023
+
+if
+
+    #newAddr(ACCT_ID, Nonce_DssCdpManager) == Urn
+    Vat == 10
 
 returns Cdpi + 1
-
-calls
-
-    Vat.hope
-    DssCdpManager.add
 ```
 
 ```act

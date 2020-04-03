@@ -14,9 +14,13 @@
       },
       "Vat": {
         "src": "lib/dss-deploy/lib/dss/src/vat.sol"
+      },
+      "UrnHandler": {
+        "src": "src/DssCdpManager.sol"
       }
     },
     "timeouts": {
+      "DssCdpManager_open_pass_rough": "16h",
       "DssCdpManager_give-diff-own-dst_pass_rough": "16h",
       "DssCdpManager_give-diff-own-dst_fail_rough": "16h",
       "Vat_grab_pass_rough": "16h",
@@ -36,6 +40,7 @@
       "Vat_fork-same_fail_rough": "2d"
     },
     "memory" : {
+      "DssCdpManager_open_pass_rough": "25G",
       "DssCdpManager_give-diff-own-dst_pass_rough": "25G",
       "DssCdpManager_give-diff-own-dst_fail_rough": "25G",
       "Vat_frob-same-nonzero_fail_rough": "25G",
