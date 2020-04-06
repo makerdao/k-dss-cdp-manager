@@ -379,6 +379,10 @@ if
     Vat == 10
 
 returns Cdpi + 1
+
+calls
+
+    Vat.hope
 ```
 
 ```act
