@@ -17,6 +17,7 @@ stdenv.mkDerivation {
     utillinux
     z3
     zip
+    zstd
   ];
 
   shellHook = ''
