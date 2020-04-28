@@ -1,5 +1,6 @@
 {
     "name": "k-dss-cdp-manager",
+    "host": "reports.makerfoundation.com",
     "src": {
       "specification": "./src/spec.md",
       "smt_prelude": "./src/prelude.smt2.md",
