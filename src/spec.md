@@ -1151,6 +1151,7 @@ iff
 
     (ACCT_ID == Urn) or (Can_urn == 1)
     (ACCT_ID == dst) or (Can_dst == 1)
+
     (Art_v + Art_u) * Rate <= (Ink_v + Ink_u) * Spot
     ((Art_v + Art_u) * Rate >= Dust) or (Art_v + Art_u == 0)
 
@@ -1415,15 +1416,15 @@ types
 
 storage
 
-    vat                             |-> Vat
-    cdpCan[Own][cdpSrc][CALLER_ID]  |-> CdpSrcCan
-    cdpCan[Own][cdpDst][CALLER_ID]  |-> CdpDstCan
-    owns[cdpSrc]                    |-> OwnSrc
-    owns[cdpDst]                    |-> OwnDst
-    urns[cdpSrc]                    |-> UrnSrc
-    urns[cdpDst]                    |-> UrnDst
-    ilks[cdpSrc]                    |-> IlkSrc
-    ilks[cdpDst]                    |-> IlkDst
+    vat                                 |-> Vat
+    cdpCan[OwnSrc][cdpSrc][CALLER_ID]   |-> CdpSrcCan
+    cdpCan[OwnDst][cdpDst][CALLER_ID]   |-> CdpDstCan
+    owns[cdpSrc]                        |-> OwnSrc
+    owns[cdpDst]                        |-> OwnDst
+    urns[cdpSrc]                        |-> UrnSrc
+    urns[cdpDst]                        |-> UrnDst
+    ilks[cdpSrc]                        |-> IlkSrc
+    ilks[cdpDst]                        |-> IlkDst
 
 storage Vat
 
@@ -1493,11 +1494,11 @@ types
 
 storage
 
-    vat                             |-> Vat
-    cdpCan[Own][cdpSrc][CALLER_ID]  |-> CdpSrcCan
-    owns[cdpSrc]                    |-> OwnSrc
-    urns[cdpSrc]                    |-> UrnSrc
-    ilks[cdpSrc]                    |-> IlkSrc
+    vat                                 |-> Vat
+    cdpCan[OwnSrc][cdpSrc][CALLER_ID]   |-> CdpSrcCan
+    owns[cdpSrc]                        |-> OwnSrc
+    urns[cdpSrc]                        |-> UrnSrc
+    ilks[cdpSrc]                        |-> IlkSrc
 
 storage Vat
 
