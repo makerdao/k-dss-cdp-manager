@@ -127,12 +127,6 @@ rule 0 <=Int (N /Int 2) => true
 rule N /Int 2 <Int pow256 => true
   requires N <Int pow256
 
-// TODO - review - do i need it?
-rule chop(X *Int X) => X *Int X
-  requires #rpow(Z, X, N, B) *Int B <Int pow256
-  andBool N >=Int 2
-
-
 rule #rpow(Z, X, 0, Base) => Z
 
 rule #rpow(Z, X, N, Base) => Z
@@ -167,8 +161,6 @@ rule #rpow( X                              , ((X *Int X) +Int Half) /Int Base, N
   andBool  N /Int 2 =/=Int 0
   andBool  Half ==Int Base /Int 2
 
-rule Z *Int X <Int pow256 => true
-  requires #rpow(Z, X, N, Base) <Int pow256
 ```
 
 ### hashed storage
@@ -637,17 +629,17 @@ rule #signed(chop((A *Int #unsigned((0 -Int B))))) <=Int 0 => #rangeSInt(256, 0 
   andBool #rangeSInt(256, 0 -Int B)
 
 rule chop(A *Int #unsigned(0 -Int B)) <=Int maxSInt256 andBool minSInt256 <=Int chop(A *Int #unsigned(0 -Int B)) => #rangeSInt(256, A *Int (0 -Int B))
-  requires #rangeUInt256(A)
-  andBool #rangeUInt256(A *Int B)
+  requires #rangeUInt(256, A)
+  andBool #rangeUInt(256, A *Int B)
   andBool 0 <Int B
   andBool #rangeSInt(256, 0 -Int B)
 ```
 
 # DssCdpManager lemmas
 
-### Concrete hash collission
-
 ```k
+// Concrete hash collission
+
 syntax Int ::= "keccak30"
 syntax Int ::= "keccak30PlusOne"
 rule keccak30 => 24465873643947496235832446106509767096567058095563226156125564318740882468607 [macro]
@@ -676,4 +668,20 @@ rule WM [ N := #take(I, W) ] => (WM [ N := (W [ 0 ] : .WordStack) ]) [ (N +Int 1
 
 rule WM [ N := #take(I, #drop(J, W)) ] => WM [ N := (W [ J ] : .WordStack) ] [ (N +Int 1) := (#take(I -Int 1, #drop(J +Int 1, W))) ]
   requires I >=Int 1
+```
+
+```k
+// DssCdpManager_frob-nonzero_pass_rough (and probably others) lemma
+rule pow256 -Int #unsigned(A) => (0 -Int A)
+  requires A <Int 0
+  andBool #rangeSInt(256, A)
+
+// DssCdpManager_quit-*, DssCdpManager_enter-* and DssCdpManager_shift-* lemma
+rule #signed(A) => A
+  requires A >Int 0
+  andBool #rangeSInt(256, A)
+
+rule #unsigned(A) => A
+  requires A >Int 0
+  andBool #rangeSInt(256, A)
 ```
