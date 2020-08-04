@@ -1,5 +1,5 @@
 ```k
-// DssCdpManager_open_pass_rough lemma
+// DssCdpManager_open_pass* lemma
 // Mask 0xffffffffffffffffffffffff0000000000000000000000000000000000000000
 rule 115792089237316195423570985007226406215939081747436879206741300988257197096960 &Int A => 0
   requires #rangeAddress(A)
@@ -21,4 +21,7 @@ rule (#sgnInterp(sgn(chop(A *Int #unsigned(B))) *Int -1, abs(chop(A *Int #unsign
   andBool B <Int 0
 //
 
-````
+// DssCdpManager_give-diff-own-dst_* lemma
+rule (KEY |-> VAL) M [KEY <- NEW_VAL] => (KEY |-> NEW_VAL) M
+
+```
